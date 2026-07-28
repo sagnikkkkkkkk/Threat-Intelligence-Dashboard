@@ -154,7 +154,7 @@ with table_col:
     st.subheader("📍 Region Snapshot")
     display_df = filtered[["region", "threat_level", "activity_score", "confidence"]].copy()
     display_df["confidence"] = (display_df["confidence"] * 100).round(0).astype(int).astype(str) + "%"
-    st.dataframe(display_df, width='stretch', hide_index=True, height=420)
+    st.dataframe(display_df, use_container_width=True, hide_index=True, height=420)
 
 st.divider()
 
@@ -171,7 +171,7 @@ fig_trend = px.line(
     labels={"activity_score": "Activity Score", "date": "Date"},
 )
 fig_trend.update_layout(height=380, legend=dict(orientation="h", y=-0.25))
-st.plotly_chart(fig_trend, width='stretch')
+st.plotly_chart(fig_trend, use_container_width=True)
 
 # ----------------------------------------------------------------------
 # Threat level distribution + model performance
@@ -188,7 +188,7 @@ with c1:
         )
     )
     fig_bar.update_layout(height=320, yaxis_title="Regions")
-    st.plotly_chart(fig_bar, width='stretch')
+    st.plotly_chart(fig_bar, use_container_width=True)
 
 with c2:
     st.subheader("🤖 AI Model Performance")
@@ -201,7 +201,7 @@ with c2:
         labels={"accuracy": "Accuracy", "latency_ms": "Latency (ms)"},
     )
     fig_models.update_layout(height=320)
-    st.plotly_chart(fig_models, width='stretch')
+    st.plotly_chart(fig_models, use_container_width=True)
 
 st.divider()
 
