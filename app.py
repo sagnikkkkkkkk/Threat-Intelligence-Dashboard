@@ -22,6 +22,7 @@ from data_simulator import (
     generate_model_scores,
     generate_ai_report,
 )
+import api_client
 
 # ----------------------------------------------------------------------
 # Page config
@@ -37,11 +38,19 @@ st.set_page_config(
 # ----------------------------------------------------------------------
 @st.cache_data(ttl=300)
 def load_data():
-    regions = generate_region_snapshot()
-    trend = generate_activity_trend()
-    alerts = generate_alerts()
-    models = generate_model_scores()
-    return regions, trend, alerts, models
+    if api_client.api_available():
+        regions = api_client.fetch_regions()
+        trend = api_client.fetch_trends()
+        alerts = api_client.fetch_alerts(limit=50)
+        models = api_client.fetch_model_scores()
+        source = "api"
+    else:
+        regions = generate_region_snapshot()
+        trend = generate_activity_trend()
+        alerts = generate_alerts()
+        models = generate_model_scores()
+        source = "local"
+    return regions, trend, alerts, models, source
 
 
 st.markdown(
@@ -68,7 +77,10 @@ st.markdown(
 st.title("🛰️ AI-Based Threat Intelligence Dashboard")
 st.caption("Prototype build · Streamlit + Plotly + Folium · Synthetic data")
 
-regions_df, trend_df, alerts_df, models_df = load_data()
+regions_df, trend_df, alerts_df, models_df, data_source = load_data()
+st.sidebar.caption(
+    f"Data source: {'🟢 FastAPI + PostgreSQL' if data_source == 'api' else '🟡 Local synthetic generator (API not running)'}"
+)
 
 # ----------------------------------------------------------------------
 # Sidebar filters
@@ -142,7 +154,7 @@ with table_col:
     st.subheader("📍 Region Snapshot")
     display_df = filtered[["region", "threat_level", "activity_score", "confidence"]].copy()
     display_df["confidence"] = (display_df["confidence"] * 100).round(0).astype(int).astype(str) + "%"
-    st.dataframe(display_df, use_container_width=True, hide_index=True, height=420)
+    st.dataframe(display_df, width='stretch', hide_index=True, height=420)
 
 st.divider()
 
@@ -159,7 +171,7 @@ fig_trend = px.line(
     labels={"activity_score": "Activity Score", "date": "Date"},
 )
 fig_trend.update_layout(height=380, legend=dict(orientation="h", y=-0.25))
-st.plotly_chart(fig_trend, use_container_width=True)
+st.plotly_chart(fig_trend, width='stretch')
 
 # ----------------------------------------------------------------------
 # Threat level distribution + model performance
@@ -176,7 +188,7 @@ with c1:
         )
     )
     fig_bar.update_layout(height=320, yaxis_title="Regions")
-    st.plotly_chart(fig_bar, use_container_width=True)
+    st.plotly_chart(fig_bar, width='stretch')
 
 with c2:
     st.subheader("🤖 AI Model Performance")
@@ -189,7 +201,7 @@ with c2:
         labels={"accuracy": "Accuracy", "latency_ms": "Latency (ms)"},
     )
     fig_models.update_layout(height=320)
-    st.plotly_chart(fig_models, use_container_width=True)
+    st.plotly_chart(fig_models, width='stretch')
 
 st.divider()
 
@@ -216,7 +228,13 @@ with alert_col:
 
 with report_col:
     st.subheader("📄 AI-Generated Intelligence Report")
-    st.markdown(generate_ai_report(filtered if len(filtered) else regions_df))
+    if data_source == "api":
+        try:
+            st.markdown(api_client.fetch_report())
+        except Exception:
+            st.markdown(generate_ai_report(filtered if len(filtered) else regions_df))
+    else:
+        st.markdown(generate_ai_report(filtered if len(filtered) else regions_df))
 
 st.divider()
 st.caption(
