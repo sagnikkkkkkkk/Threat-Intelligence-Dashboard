@@ -42,7 +42,7 @@ back to the in-process synthetic generator — so this still works standalone.
    ```bash
    uvicorn main:app --reload --port 8000
    ```
-   Interactive docs: http://localhost:8000/docs
+   Interactive docs: [http://localhost:8000/docs](https://threat-intelligence-dashboard-fgtpmacqn7587z9qspvqmp.streamlit.app/)
 
 4. **Run the dashboard** (in a separate terminal, from the project root):
    ```bash
