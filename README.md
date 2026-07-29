@@ -1,9 +1,15 @@
-# Threat Intelligence Dashboard — Prototype
+# Threat Intelligence Dashboard
 
 A demo dashboard (Streamlit + Plotly + Folium) that visualizes **synthetic**
 regional activity data with an interactive map, KPI cards, activity trends,
 threat-level distribution, a simulated alert feed, and a template-generated
 "AI intelligence report."
+
+## Live demo
+
+Open the deployed app here:
+
+https://threat-intelligence-dashboard-fgtpmacqn7587z9qspvqmp.streamlit.app/
 
 > ⚠️ **All data is synthetically generated** (`data_simulator.py`). This
 > project does not connect to any real satellite imagery, sensor network,
@@ -42,7 +48,7 @@ back to the in-process synthetic generator — so this still works standalone.
    ```bash
    uvicorn main:app --reload --port 8000
    ```
-   Interactive docs: https://threat-intelligence-dashboard-fgtpmacqn7587z9qspvqmp.streamlit.app/
+   Interactive docs: http://localhost:8000/docs
 
 4. **Run the dashboard** (in a separate terminal, from the project root):
    ```bash
